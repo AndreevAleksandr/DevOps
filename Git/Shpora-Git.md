@@ -84,6 +84,7 @@ Version 1       Version 2        Version 3        Version 4       Version 5
 - "Подгтовленный" означает, что вы указали Git, что эти изменения войдут в следующий коммит
 - "Зафиксированный" означает, что данные надежно сохранены в локальной базе Git
 
+```mermaid
 graph LR
     WD[📁 Working Directory<br>Рабочая директория] -->|git add| SA[📦 Staging Area<br>Индекс / Подготовка]
     SA -->|git commit| GD[💾 .git Directory<br>Репозиторий / История]
@@ -92,7 +93,8 @@ graph LR
     style WD fill:#f9f,stroke:#333,stroke-width:2px
     style SA fill:#ff9,stroke:#333,stroke-width:2px
     style GD fill:#9f9,stroke:#333,stroke-width:2px
-			
+```			
+
 ### Основные команды Git
 
 - Указывает имя автора коммита: ` git config --global user.name "Имя" `
