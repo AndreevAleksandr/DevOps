@@ -347,7 +347,7 @@ sar-f/var/log/sa/sa15 | grep -A1 "Average" | head -20
 - Follow (как tail -f): ` journalctl -f `
 - Логи сервиса nginx: ` journalctl -u nginx `
 - Follow конкретного сервиса: ` journalctl -u nginx -f `
-- За последний час: ` journalctl --since "1 hour ago" ` / ` journalctl --since "2026-09-09 14:00:00" --until "15:00:00"
+- За последний час: ` journalctl --since "1 hour ago" ` / ` journalctl --since "2026-09-09 14:00:00" --until "15:00:00" `
 - Только ошибки: ` journalctl -p err `
 - Логи текущей загрузки: ` journalctl -b `
 - Логи предыдущей загрузки: ` journalctl -b -1 `
@@ -360,13 +360,13 @@ sar-f/var/log/sa/sa15 | grep -A1 "Average" | head -20
 
 **Использование**
 - Быстрый поиск проблем: ` journalctl -p err --since "10 min ago" `
-- Расследование инцидентов: ` journalctl -b -1 | grep -i error
-- Мониторинг в реальном времени: ` journalctl -f -u myapp
+- Расследование инцидентов: ` journalctl -b -1 | grep -i error `
+- Мониторинг в реальном времени: ` journalctl -f -u myapp `
 ---
 **syslog** - Классическая система логирования
 
 - Общие системные сообщения: ` /var/log/syslog или /var/log/messages `
-- Аутентификация (SSH / sudo): ` /var/log/auth.log или /var/log/secure
+- Аутентификация (SSH / sudo): ` /var/log/auth.log или /var/log/secure `
 - Сообщения ядра: ` var/log/kern.log `
 - Загрузка ядра и оборудование: ` /var/log/dmesg `
 - Загрузка системы: ` /var/log/boot.log `
