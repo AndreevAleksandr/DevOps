@@ -66,7 +66,7 @@ if __name__ == '__main__':
         <p>Хост: test-vm</p>
 	</body>
 </html>
-
+```
 - Создаем файл юнита: ` nano /etc/systemd/system/PythonHTTP_app.service `
 
 ```
