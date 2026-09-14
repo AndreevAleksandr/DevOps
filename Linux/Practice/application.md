@@ -541,7 +541,7 @@ systemd[1]: Started nginx.service - A high performance web server and a reverse 
 {"status":"healthy","database":"connected"}
 ```
 
-- Проверяем frontend: ` curl http://localhost/
+- Проверяем frontend: ` curl http://localhost/ `
 ```
 <!DOCTYPE html>
 <html lang="ru">
