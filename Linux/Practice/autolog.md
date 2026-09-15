@@ -116,3 +116,310 @@
 	Запускаем: ` ./hello-test `
 	
 - Текст (grep, awk, sed, cut, sort, uniq, wc)
+	- Поиск по шаблону: ` grep `
+	- Ищим все ERROR в логе: ` grep ERROR logs/app.log `
+	- Игнорируем регистр: ` grep -i error logs/app.log `
+	- Смотрим номер строки: ` grep -n ERROR logs/app.log `
+	- Смотрим две строки до и после совпадения: ` grep -C 2 ERROR logs/app.log `
+	- Обратный список: ` grep -v ERROR logs/app.log `
+	- Подсчитать кол-во совпадений: ` grep -c ERROR logs/app.log `
+	- Регулярыне выражения: ` grep -E "ERROR|WARN" logs/app.log ` / ` grep -E "2026-09-14 10:1[56]" logs/app.log `
+	
+	- Обработка колонок: ` awk `
+	- Выводим первую колонку: ` awk '{print $1}' logs/access.log `
+	- Выводим IP и метод запроса: ` awk '{print $1 $6}' logs/access.log | tr -d '"' `
+	- Считаем сумму байт: ` awk '{sum += $9} END {print sum}' logs/access.log `
+	- Фильтруем только 200ые ответы: ` awk '$8 == 200 {print $0}' logs/access.log `
+	- Считаем кол-во запросов по IP: ` awk '{print $1}' logs/access.log | sort | uniq -c | sort -rn `
+	- Средняя длинна ответа: ` awk '{sum += $10; count++} END {print "Average:", sum/count}' logs/access.log `
+	
+	- Замена текста: ` sed `
+	- Меняем первое слово в строке: ` echo "hello world" | sed 's/hello/goodbye/' `
+	- Меняем все вхождения: ` echo "hello hello world" | sed 's/hello/goodbye/g' `
+	- Меняем файл: ` sed -i 's/debug/info/g' config.txt `
+	- Удаляем строки с ERROR: ` sed '/ERROR/d' logs/app.log `
+	- Показать строки с ERROR: ` sed -n '/ERROR/p' logs/app.log `
+	- Меняем дату: ` sed 's/2026-09-14/2026-09-15/g' logs/app.log `
+	- Удаляем пустые строки: ` sed '/^$/d' logs/app.log `
+	
+	- Выделение колонок: ` cut `
+	- Вырезаем первую колонку: ` cut -d' ' -f1 logs/access.log `
+	- Вырезаем IP и статус: ` cut -d' ' -f1,9 logs/access.log `
+	- Вырезаем диапозон символов: ` echo "Hello World" | cut -c1-5 `
+	- Разделитель таблицы: ` echo -e "name\tage\tcity" | cut -f2 `
+	
+	- ` sort, uniq, wc `
+	- Сортировка: ` sort logs/app.log `
+	- Обратная сортировка: ` sort -r logs/app.log `
+	- Числовая сортировка: ` echo -e "5\n2\n10\n1" | sort -n `
+	- Удаляем дубликаты: ` echo -e "a\na\nb\nb\na" | sort | uniq `
+	- Считаем кол-во повторений: ` awk '{print $1}' logs/access.log | sort | uniq -c | sort -rn `
+	- ` wc ` - word count
+	- Только строки: ` wc -l logs/app.log `
+	- Только слова: ` wc -w logs/app.log `
+	- Только байты: ` wc -c logs/app.log `
+	
+- Bash-скрипт
+	- Создаем файл: ` nano script/analyz_logs.sh `
+	```
+	#!/bin/bash
+
+	# ============================================
+	# Скрипт анализа логов
+	# ============================================
+
+	# Переменные
+	LOG_DIR="/home/$USER/log-analyzer/logs"
+	REPORT_DIR="/home/$USER/log-analyzer/reports"
+	DATE=$(date +%Y-%m-%d_%H-%M-%S)
+
+	# Цвета для вывода
+	RED='\033[0;31m'
+	GREEN='\033[0;32m'
+	YELLOW='\033[1;33m'
+	NC='\033[0m' # No Color
+
+	# Функция для вывода сообщений
+	log_message() {
+		echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')]${NC} $1"
+	}
+
+	# Функция для вывода ошибок
+	log_error() {
+		echo -e "${RED}[ERROR]${NC} $1" >&2
+	}
+
+	# Проверка существования директории
+	if [ ! -d "$LOG_DIR" ]; then
+		log_error "Директория с логами не найдена: $LOG_DIR"
+		exit 1
+	fi
+
+	# Создать директорию для отчетов
+	mkdir -p "$REPORT_DIR"
+
+	log_message "Начало анализа логов..."
+
+	# ============================================
+	# Анализ app.log
+	# ============================================
+	APP_LOG="$LOG_DIR/app.log"
+
+	if [ -f "$APP_LOG" ]; then
+		log_message "Анализ $APP_LOG"
+    
+		# Подсчитать количество ошибок
+		ERROR_COUNT=$(grep -c "ERROR" "$APP_LOG")
+		WARN_COUNT=$(grep -c "WARN" "$APP_LOG")
+		INFO_COUNT=$(grep -c "INFO" "$APP_LOG")
+    
+		echo "================================"
+		echo "Статистика по app.log:"
+		echo "  ERROR: $ERROR_COUNT"
+		echo "  WARN:  $WARN_COUNT"
+		echo "  INFO:  $INFO_COUNT"
+		echo "================================"
+    
+		# Найти уникальные ошибки
+		echo -e "\nУникальные ошибки:"
+		grep "ERROR" "$APP_LOG" | awk -F'[][]' '{print $2}' | sort | uniq -c | sort -rn
+    
+	else
+		log_error "Файл app.log не найден"
+	fi
+
+	# ============================================
+	# Анализ access.log
+	# ============================================
+	ACCESS_LOG="$LOG_DIR/access.log"
+
+	if [ -f "$ACCESS_LOG" ]; then
+		log_message "Анализ $ACCESS_LOG"
+    
+		echo -e "\nТоп-5 IP адресов:"
+		awk '{print $1}' "$ACCESS_LOG" | sort | uniq -c | sort -rn | head -5
+    
+		echo -e "\nРаспределение HTTP статусов:"
+		awk '{print $9}' "$ACCESS_LOG" | sort | uniq -c | sort -rn
+    
+		echo -e "\nКоличество запросов по методам:"
+		awk '{print $6}' "$ACCESS_LOG" | tr -d '"' | sort | uniq -c | sort -rn
+    
+	else
+		log_error "Файл access.log не найден"
+	fi
+
+	# ============================================
+	# Генерация отчета
+	# ============================================
+	REPORT_FILE="$REPORT_DIR/report_$DATE.txt"
+
+	log_message "Генерация отчета: $REPORT_FILE"
+
+	cat > "$REPORT_FILE" << EOF
+	========================================
+	ОТЧЕТ ПО АНАЛИЗУ ЛОГОВ
+	Дата: $(date)
+	========================================
+
+	1. СТАТИСТИКА ПО app.log:
+		ERROR: $ERROR_COUNT
+		WARN:  $WARN_COUNT
+		INFO:  $INFO_COUNT
+
+	2. ТОП-5 IP АДРЕСОВ:
+	$(awk '{print $1}' "$ACCESS_LOG" | sort | uniq -c | sort -rn | head -5)
+
+	3. HTTP СТАТУСЫ:
+	$(awk '{print $9}' "$ACCESS_LOG" | sort | uniq -c | sort -rn)
+
+	4. МЕТОДЫ ЗАПРОСОВ:
+	$(awk '{print $6}' "$ACCESS_LOG" | tr -d '"' | sort | uniq -c | sort -rn)
+
+	========================================
+	Конец отчета
+	========================================
+	EOF
+
+	log_message "Отчет сохранен: $REPORT_FILE"
+	log_message "Анализ завершен!"
+
+	exit 0
+	```
+	- Делаем скрипт испольняемые: ` chmod +x script/analyz_logs.sh `
+	- Запускаем: ` ./script/analyz_logs.sh
+	- Смотрим что записалось в файл репорт: ` cat reports/reports_*.txt `
+	
+	- Условыне операторы: ` if / else / case `
+	- Создаем скрипт: ` nano script/test_case.sh `
+	```
+	#!/bin/bash
+
+	STATUS=200
+
+	case $STATUS in
+		200)
+			echo "OK"
+			;;
+		404)
+			echo "Not Found"
+			;;
+		500)
+			echo "Server Error"
+			;;
+		*)
+			echo "Unknown status"
+			;;
+	esac
+	```
+	- Запускаем: ` ./script/test_case.sh `
+	
+	- Цикл for
+	- Создаем скрипт: ` nano script/test_loops.sh `
+	```
+	#!/bin/bash
+
+	# Простой for
+	for i in 1 2 3 4 5; do
+		echo "Iteration $i"
+	done
+
+	# for с диапазоном
+	for i in {1..5}; do
+		echo "Number $i"
+	done
+
+	# for по файлам
+	for file in logs/*.log; do
+		echo "Processing: $file"
+		wc -l "$file"
+	done
+
+	# while
+	COUNTER=0
+	while [ $COUNTER -lt 5 ]; do
+		echo "Counter: $COUNTER"
+		((COUNTER++))
+	done
+
+	# Чтение файла построчно
+	while IFS= read -r line; do
+		echo "Line: $line"
+	done < logs/app.log | head -5
+	```
+	Запускаем: ` ./script/test_loops.sh
+	
+	- Функции и exit
+	- Создаем файл: ` nano script/test_function.sh `
+	```
+	#!/bin/bash
+
+	# Простая функция
+	greet() {
+		echo "Hello, $1!"
+	}
+
+	greet "World"
+	greet "DevOps"
+
+	# Функция с возвратом значения
+	check_file() {
+		if [ -f "$1" ]; then
+			return 0  # Успех
+		else
+			return 1  # Ошибка
+		fi
+	}
+
+	# Использование
+	if check_file "logs/app.log"; then
+		echo "Файл найден"
+	else
+		echo "Файл не найден"
+	fi
+
+	# Exit-коды
+	exit 0  # Успех
+	exit 1  # Общая ошибка
+	exit 2  # Неправильное использование
+	exit 127 # Команда не найдена
+	```
+	
+- SSH и передача данных
+	- Редактируем: ` nano ~/.ssh/config `
+	```
+	# Локальный сервер (VM)
+	Host myserver
+		HostName 192.168.0.38
+		User mitest
+		Port 22
+		IdentityFile ~/.ssh/id_ed25519
+		ForwardAgent yes
+
+	# Удаленный сервер (пример)
+	Host production
+		HostName example.com
+		User deploy
+		Port 22
+		IdentityFile ~/.ssh/id_ed25519
+		Compression yes
+		ServerAliveInterval 60
+	```
+	> Теперь можно пдключаться по имени хоста: ` ssh myserver `
+	
+	- Копируем файл на сервер: ` scp logs/app.log myserver:/home/mitest/ `
+	- Копируем директорию рекурсивно: ` scp -r scripts/ myserver:/home/mitest/scripts/ `
+	- Копируем с сервера: ` scp myserver:/home/mitest/reports/report_*.txt ./reports/ `
+	- С указанием порта: ` scp -P 2222 file.txt user@host:/path/ `
+	
+	- Синхронизация ` rsync `
+	- Синхронизируем директорию: ` rsync -avz scripts/ myserver:/home/mitest/scripts/ `
+	- Сохраняет права, даты, ссылки: ` -a `
+	- Подробный вывод: ` -v `
+	- Сжатие при передаче: ` -z `
+	- Удаляет файлы на сервере, которых нет локально: ` rsync -avz --delete scripts/ myserver:/home/mitest/scripts/ `
+	
+	- Проброс портов
+	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver
+	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver
+	- Динамический проброс: ` ssh -D 1080 myserver
