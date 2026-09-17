@@ -347,7 +347,7 @@
 		echo "Line: $line"
 	done < logs/app.log | head -5
 	```
-	Запускаем: ` ./script/test_loops.sh
+	Запускаем: ` ./script/test_loops.sh `
 	
 	- Функции и exit
 	- Создаем файл: ` nano script/test_function.sh `
@@ -420,6 +420,7 @@
 	- Удаляет файлы на сервере, которых нет локально: ` rsync -avz --delete scripts/ myserver:/home/mitest/scripts/ `
 	
 	- Проброс портов
+<<<<<<< HEAD
 	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver
 	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver
 	- Динамический проброс: ` ssh -D 1080 myserver
@@ -485,3 +486,8 @@
 	- ` -v ` (verbose): подробный вывод
 	- ` -z `(compress): сжимает данные при передаче по сети
 	- ` --delete `: делает зеркальную копию (удаляет на приемнике файлы, которые были удалены на источнике)
+=======
+	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver `
+	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver `
+	- Динамический проброс: ` ssh -D 1080 myserver `
+>>>>>>> aef1af80ce35a78eb49fafd9370e5143d5e92701
