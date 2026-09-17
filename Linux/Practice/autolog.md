@@ -420,10 +420,10 @@
 	- Удаляет файлы на сервере, которых нет локально: ` rsync -avz --delete scripts/ myserver:/home/mitest/scripts/ `
 	
 	- Проброс портов
-<<<<<<< HEAD
-	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver
-	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver
-	- Динамический проброс: ` ssh -D 1080 myserver
+
+	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver `
+	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver `
+	- Динамический проброс: ` ssh -D 1080 myserver `
 	
 ### Разбор команд
 
@@ -490,4 +490,3 @@
 	- Локальный проброс: ` ssh -L 8000:localhost:8000 myserver `
 	- Удаленный проброс: ` ssh -R 8080:localhost:80 myserver `
 	- Динамический проброс: ` ssh -D 1080 myserver `
->>>>>>> aef1af80ce35a78eb49fafd9370e5143d5e92701
